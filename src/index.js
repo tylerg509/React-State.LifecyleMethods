@@ -1,38 +1,44 @@
 import React from 'react';
-import ReactDOM from 'react-dom'
-import faker from 'faker';
-import CommentDetail from './CommentDetail'
-import ApprovalCard from './ApprovalCard';
+import ReactDOM from 'react-dom';
+import SeasonDisplay from './SeasonDisplay';
+import Spinner from './Spinner';
 
-const App = () => {
-    return(
-    <div className="ui container comments">
-        <ApprovalCard>
-            <CommentDetail 
-                author="Sam" 
-                timeAgo="Today at 444" 
-                avatar={faker.image.avatar()}/>
-        </ApprovalCard>
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+        //the only time we do direct assignment to state!!!!!!!!!!!!! never do this otherwise
+        this.state = { lat: null, errorMessage:''};
+    }
 
-        <ApprovalCard>
-            <CommentDetail 
-                author="Alex" 
-                timeAgo="Today at 333" 
-                commentText="No this is my post" 
-                avatar={faker.image.avatar()}/>
-        </ApprovalCard>
+    componentDidMount() {
+        window.navigator.geolocation.getCurrentPosition(
+            position => {
+                //call setstate!!!!!!!!!!!!!!!!!!!!!!! don't set state directly 
+                this.setState({ lat: position.coords.latitude})},
+            err => {this.setState({ errorMessage: err.message})}
+        );
+    }
 
-        <ApprovalCard>
-            <CommentDetail 
-                author="Jane" 
-                timeAgo="Yesterday at 222" 
-                commentText="Yeahhhhh this is my post" 
-                avatar={faker.image.avatar()}/>
-        </ApprovalCard>
+    renderContent() {
+        if(this.state.errorMessage && !this.state.lat) {
+            return <div> Error: {this.state.errorMessage}</div>;
+        }
 
-    </div>
-    );
-};
+        if(!this.state.errorMessage && this.state.lat) {
+            return <SeasonDisplay lat= {this.state.lat}/>;
+        }
+
+        return <Spinner message="Please accept location request"/>;
+    }
+
+    render() {
+        return (
+            <div className="border red">
+                {this.renderContent()}
+            </div>
+        )
+    }
+}
 
 ReactDOM.render(<App />, document.querySelector('#root'))
 
