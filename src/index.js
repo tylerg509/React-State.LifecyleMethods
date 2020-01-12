@@ -2,18 +2,11 @@ import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import SeasonDisplay from './SeasonDisplay';
 import Spinner from './Spinner';
+import useLocation from './useLocation'
 
 //converted the index-lifecyle file to a hook. AMAZING!
 const App = () => {
-    const [lat, setLat] = useState(null);
-    const [errorMessage, setErrorMessage] = useState('')
-    //only want this to be invoked one time. so we will pass an empty array as second argument
-    useEffect(() => {
-        window.navigator.geolocation.getCurrentPosition(
-            position => setLat(position.coords.latitude),
-            err => setErrorMessage(err.message)
-        );
-    },[])
+    const[lat, errorMessage] = useLocation()
 
     let content;
     if(errorMessage){
